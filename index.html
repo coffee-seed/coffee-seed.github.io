@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset='utf-8'>
+	</head>
+	<body>
+		<canvas style='border: 1px black solid' width=100 height=100 id='cnv' onmousedown='mouseC(event.which,event.offsetX,event.offsetY); ' oncontextmenu="return false;"></canvas><br>
+		<button onclick='learn(a,500000); new_dot=false;'>Test</button>
+		<button onclick='a=[]; ctx.clearRect(0,0,100,100); new_dot=true;'>Clear</button>
+		<script src='neural_engine.js'></script>
+		<script>
+			var a=[];
+			var new_dot=true;
+			var ctx=cnv.getContext('2d');
+		ner1= new neural_network([2,5,2],sigmoid,dsigmoid,init,true);
+
+			function draw(){
+				var tmp;
+				for(var i=0;i<10;i++){
+					for(var j=0;j<10;j++){
+						tmp=ner1.run([i/10,j/10]);
+						console.log(tmp);
+						if(tmp[0]>tmp[1]){
+							ctx.fillStyle="#00FF00";
+						}
+						else{
+							ctx.fillStyle="#0000FF"; 
+						}
+						ctx.fillRect(i*10,j*10,10,10);
+					}
+				}
+				for(i=0; i<a.length; i++){
+					if(a[i][2]==1){
+						ctx.fillStyle="#FF00FF";
+					}
+					else{
+						ctx.fillStyle="#FFFF00"; 
+					}
+					ctx.fillRect(a[i][0]*100-5,a[i][1]*100-5,10,10);
+				}
+			}
+			function mouseC(type,x,y){
+					if(new_dot==true){
+					var xx=x;
+					var yy=y;
+					var l=a.length;
+					a.push([]);
+					a[l].push(x/100);
+					a[l].push(y/100);
+					if(type==1){
+						ctx.fillStyle="#00FF00";
+						a[l].push(1);
+					}
+					else{
+						ctx.fillStyle="#0000FF";
+						a[l].push(2);            
+					}
+					ctx.fillRect(xx-5,yy-5,10,10);
+				}
+				else{
+					var tmp=ner1.run([x/100,y/100]);
+					console.log(tmp);
+					if(tmp[0]>tmp[1]){
+						alert(1);
+					}
+					else{
+						alert(2);
+					}
+				}
+				return false;
+			}
+			function learn(A,T){
+				input=[];
+				out=[];
+					for(var i=0; i<A.length; i++){
+						var real_out=[];
+						if(A[i][2]==1){
+						real_out.push(1);
+						real_out.push(0);
+						}
+						else{
+							real_out.push(0);
+							real_out.push(1);
+						}
+						var inp=[];
+						inp.push(A[i][0]);
+						inp.push(A[i][1]);
+						input.push(inp);
+						out.push(real_out);
+					}
+					console.log(input,out);
+				ner1.learn(input,out,0.00000000000000000000000001,0.0001,T);
+				console.log('Done');
+				draw();
+				new_dot=false;
+			}
+			function test(i){
+				var inp=[];
+				inp.push(a[i][0]);
+				inp.push(a[i][1]);
+			   return ner1.run(inp);
+			}
+			/*
+			a1=[];
+			a1.push(1);
+			a1.push(5);
+			b1=[];
+			b1.push(0);
+			b1.push(1);
+			a2=[];
+			a2.push(5);
+			a2.push(1);
+			b2=[];
+			b2.push(1);
+			b2.push(0);
+			
+			for(var i=0;i<1000;i++){
+				ner1.backpropagation(b2,a2,0.1);
+				ner1.backpropagation(b1,a1,0.1);
+			}
+			c=[];
+			c.push(2);
+			c.push(5);
+			ner1.calc(c);
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+		blank_map=[];
+		blank_map.push(2);
+		blank_map.push(1);
+		net= random_net(blank_map,0.000001);    
+		ner2= new neural_network(net);   
+			
+			
+		a1=[0,1];
+		b1=[1];
+		a2=[1,1];
+		b2=[0];
+		a3=[1,0];
+		b3=[1];
+		a4=[0,0];
+		b4=[0];
+
+
+		for(var i=0;i<100;i++){
+			ner2.backpropagation(b1,a1,0.01);
+			ner2.backpropagation(b2,a2,0.01);
+			ner2.backpropagation(b3,a3,0.01);
+			ner2.backpropagation(b4,a4,0.01);
+		}
+			
+			
+			
+			
+			*/
+		</script>
+	</body>
+</html>
